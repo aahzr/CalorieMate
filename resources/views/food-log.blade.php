@@ -6,8 +6,9 @@
     <div class="row g-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="fs-4 fw-semibold text-primary">Food Log</h1>
-                <div class="d-flex align-items-center gap-3">
+                <div></div>
+                <div class="d-flex align-items-center gap-3 position-relative">
+                    <i class="fas fa-calendar-alt text-primary" id="calendarIcon" style="cursor: pointer;"></i>
                     <a href="{{ route('food-log', ['date' => $date->copy()->subDay()->format('Y-m-d')]) }}" aria-label="Previous day" class="btn btn-link text-primary"><i class="fas fa-chevron-left"></i></a>
                     <span class="fs-6 fw-semibold text-primary">{{ $date->format('D, d M Y') }}</span>
                     <a href="{{ route('food-log', ['date' => $date->copy()->addDay()->format('Y-m-d')]) }}" aria-label="Next day" class="btn btn-link text-primary"><i class="fas fa-chevron-right"></i></a>
@@ -35,48 +36,48 @@
             </form>
         </div>
         <!-- Hasil Pencarian -->
-        <div class="col-12">
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h3 class="fs-5 fw-semibold text-primary mb-3">Hasil Pencarian</h3>
-                    <div id="loading" style="display: none;" class="text-center">
-                        <p class="fs-6 text-secondary">Memuat...</p>
-                    </div>
-                    <div id="searchResults">
-                        @if (!empty($foodResults))
-                            @foreach ($foodResults as $food)
-                                <div class="bg-light-green rounded-3 p-3 mb-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <p class="fs-6 mb-2">{{ $food['food_name'] }} ({{ $food['brand_name'] ?? 'Generic' }})</p>
-                                            <p class="fs-6 text-secondary mb-2">{{ $food['food_description'] }}</p>
-                                        </div>
-                                        <form action="{{ route('food-log.store') }}?date={{ $date->format('Y-m-d') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="food_id" value="{{ $food['food_id'] }}">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <select name="meal_type" class="form-select" style="width: 150px;" required>
-                                                    <option value="Breakfast">Sarapan</option>
-                                                    <option value="Lunch">Makan Siang</option>
-                                                    <option value="Dinner">Makan Malam</option>
-                                                    <option value="Snack">Camilan</option>
-                                                </select>
-                                                <button type="submit" class="btn btn-primary btn-sm">Tambah</button>
+        @if ($searchQuery)
+            <div class="col-12">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="fs-5 fw-semibold text-primary mb-3">Hasil Pencarian</h3>
+                        <div id="loading" style="display: none;" class="text-center">
+                            <p class="fs-6 text-secondary">Memuat...</p>
+                        </div>
+                        <div id="searchResults">
+                            @if (!empty($foodResults))
+                                @foreach ($foodResults as $food)
+                                    <div class="bg-light-green rounded-3 p-3 mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <p class="fs-6 mb-2">{{ $food['food_name'] }} ({{ $food['brand_name'] ?? 'Generic' }})</p>
+                                                <p class="fs-6 text-secondary mb-2">{{ $food['food_description'] }}</p>
                                             </div>
-                                        </form>
+                                            <form action="{{ route('food-log.store') }}?date={{ $date->format('Y-m-d') }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="food_id" value="{{ $food['food_id'] }}">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <select name="meal_type" class="form-select" style="width: 150px;" required>
+                                                        <option value="Breakfast">Sarapan</option>
+                                                        <option value="Lunch">Makan Siang</option>
+                                                        <option value="Dinner">Makan Malam</option>
+                                                        <option value="Snack">Camilan</option>
+                                                    </select>
+                                                    <button type="submit" class="btn btn-primary btn-sm">Tambah</button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
-                                </div>
-                            @endforeach
-                        @else
-                            <p class="fs-6 text-secondary">Tidak ada hasil ditemukan. Coba kueri lain seperti 'chicken' atau gunakan input manual di card.</p>
-                            @if ($searchQuery)
+                                @endforeach
+                            @else
+                                <p class="fs-6 text-secondary">Tidak ada hasil ditemukan. Coba kueri lain seperti 'chicken' atau gunakan input manual di card.</p>
                                 <p class="fs-6 text-secondary">Kueri: {{ $searchQuery }}</p>
                             @endif
-                        @endif
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        @endif
         <!-- Kalori Harian -->
         <div class="col-12 col-md-6">
             <div class="card">
@@ -149,7 +150,7 @@
                 </div>
             </div>
             <!-- Modal Tambah -->
-            <div class="modal fade" id="addFoodModal-{{ str_replace(' ', '-', $mealType) }}" tabindex="-1" aria-labelledby="addFoodModalLabel-{{ str_replace(' ', '-', $mealType) }}">
+            <div class="modal fade" id="addFoodModal-{{ str_replace(' ', '-', $mealType) }}" tabindex="-1" aria-labelledby="addFoodModalLabel-{{ str_replace(' ', '-', $mealType) }}" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -210,7 +211,7 @@
             <!-- Modal Edit -->
             @if($foodLogs->get($mealType, []))
                 @foreach($foodLogs->get($mealType, []) as $food)
-                    <div class="modal fade" id="editFoodModal-{{ $food->id }}" tabindex="-1" aria-labelledby="editFoodModalLabel-{{ $food->id }}">
+                    <div class="modal fade" id="editFoodModal-{{ $food->id }}" tabindex="-1" aria-labelledby="editFoodModalLabel-{{ $food->id }}" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -296,5 +297,62 @@
             document.getElementById('loading').style.display = 'none';
             document.getElementById('searchResults').style.display = 'block';
         });
+
+        const calendarIcon = document.getElementById('calendarIcon');
+        const datePicker = document.createElement('input');
+        datePicker.type = 'date';
+        datePicker.id = 'customDatePicker';
+        datePicker.style.position = 'absolute';
+        datePicker.style.zIndex = '1000';
+        datePicker.style.border = '1px solid #ced4da';
+        datePicker.style.borderRadius = '0.25rem';
+        datePicker.style.padding = '0.375rem 0.75rem';
+        datePicker.style.fontSize = '0.875rem';
+        datePicker.style.backgroundColor = '#fff';
+        datePicker.style.display = 'none';
+        document.body.appendChild(datePicker);
+
+        calendarIcon.addEventListener('click', function(e) {
+            e.preventDefault();
+            const iconRect = calendarIcon.getBoundingClientRect();
+            datePicker.style.top = (iconRect.bottom + window.scrollY) + 'px';
+            datePicker.style.left = (iconRect.left + window.scrollX) + 'px';
+            datePicker.value = '{{ $date->format('Y-m-d') }}';
+            datePicker.style.display = 'block';
+            datePicker.focus();
+
+            datePicker.onchange = function() {
+                const selectedDate = this.value;
+                if (selectedDate) {
+                    window.location.href = "{{ route('food-log') }}?date=" + selectedDate;
+                    datePicker.style.display = 'none';
+                }
+            };
+
+            // Sembunyikan picker jika klik di luar
+            document.addEventListener('click', function hidePicker(event) {
+                if (!calendarIcon.contains(event.target) && !datePicker.contains(event.target)) {
+                    datePicker.style.display = 'none';
+                    document.removeEventListener('click', hidePicker);
+                }
+            });
+        });
     </script>
+
+    @section('styles')
+        <style>
+            #calendarIcon {
+                font-size: 1.2rem;
+                cursor: pointer;
+            }
+            #customDatePicker {
+                cursor: pointer;
+            }
+            #customDatePicker:focus {
+                border-color: #0d6efd;
+                box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+                outline: none;
+            }
+        </style>
+    @endsection
 @endsection
