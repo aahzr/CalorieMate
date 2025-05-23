@@ -36,4 +36,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/diet-journal', [DietJournalController::class, 'index'])->name('diet-journal');
     Route::post('/diet-journal/store', [DietJournalController::class, 'store'])->name('diet-journal.store');
     Route::delete('/diet-journal/{id}', [DietJournalController::class, 'destroy'])->name('diet-journal.destroy');
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports');
 });

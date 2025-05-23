@@ -36,7 +36,7 @@
             <div class="card text-center">
                 <div class="card-body">
                     <i class="fas fa-bolt text-primary fs-3 mb-2"></i>
-                    <p class="fs-3 fw-semibold text-primary">8</p>
+                    <p class="fs-3 fw-semibold text-primary">{{ $streak }}</p>
                     <p class="fs-6 text-secondary">Hari Terbaik Berturut-turut</p>
                 </div>
             </div>
@@ -45,7 +45,7 @@
             <div class="card text-center">
                 <div class="card-body">
                     <i class="fas fa-utensils text-primary fs-3 mb-2"></i>
-                    <p class="fs-3 fw-semibold text-primary">27</p>
+                    <p class="fs-3 fw-semibold text-primary">{{ $completeDays }}</p>
                     <p class="fs-6 text-secondary">Hari Catatan Lengkap</p>
                 </div>
             </div>
@@ -54,8 +54,8 @@
             <div class="card text-center">
                 <div class="card-body">
                     <i class="fas fa-chart-line text-primary fs-3 mb-2"></i>
-                    <p class="fs-3 fw-semibold text-primary">3.2 kg</p>
-                    <p class="fs-6 text-secondary">Berat Badan Turun</p>
+                    <p class="fs-3 fw-semibold text-primary">{{ $weightChange ? abs($weightChange) . ' kg' : '0 kg' }}</p>
+                    <p class="fs-6 text-secondary">Berat Badan {{ $calorieGoalType == 'deficit' ? 'Turun' : 'Naik' }}</p>
                 </div>
             </div>
         </div>
@@ -90,29 +90,31 @@
             </div>
         </div>
         <div class="col-12 col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <i class="far fa-check-circle text-primary"></i>
-                        <span class="fs-6 fw-semibold text-primary">Capaian Target Mingguan</span>
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item bg-light-green d-flex justify-content-between align-items-center">
-                            <span>Target Kalori Harian</span>
-                            <span class="badge bg-primary text-white rounded-pill">6/7</span>
-                        </li>
-                        <li class="list-group-item bg-light-green d-flex justify-content-between align-items-center">
-                            <span>Target Berat Turun</span>
-                            <span class="badge bg-primary text-white rounded-pill">2/2 kg</span>
-                        </li>
-                        <li class="list-group-item bg-light-green d-flex justify-content-between align-items-center">
-                            <span>Catat Makan Lengkap</span>
-                            <span class="badge bg-primary text-white rounded-pill">5/7</span>
-                        </li>
-                    </ul>
-                </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <i class="far fa-check-circle text-primary"></i>
+                <span class="fs-6 fw-semibold text-primary">Capaian Target Mingguan</span>
             </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-light-green d-flex justify-content-between align-items-center">
+                    <span>Target Kalori Harian</span>
+                    <span class="badge bg-primary text-white rounded-pill">{{ $calorieData->count() }}/7</span>
+                </li>
+                <li class="list-group-item bg-light-green d-flex justify-content-between align-items-center">
+                    <span>Target Berat {{ $calorieGoalType == 'deficit' ? 'Turun' : 'Naik' }}</span>
+                    <span class="badge bg-primary text-white rounded-pill">
+                        {{ number_format(abs($weightChange ?? 0), 1) }} kg dari {{ number_format($weightTarget ?? 0.5, 1) }} kg
+                    </span>
+                </li>
+                <li class="list-group-item bg-light-green d-flex justify-content-between align-items-center">
+                    <span>Catat Makan Lengkap</span>
+                    <span class="badge bg-primary text-white rounded-pill">{{ $completeDays }}/7</span>
+                </li>
+            </ul>
         </div>
+    </div>
+</div>
     </div>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
