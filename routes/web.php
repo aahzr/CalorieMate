@@ -25,4 +25,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.updatePhoto');
+    Route::post('/weight-tracking/set-target', [WeightTrackingController::class, 'setTarget'])->name('weight-tracking.set-target');
+    Route::delete('/weight-tracking/{id}', [WeightTrackingController::class, 'destroy'])->name('weight-tracking.destroy');
+    Route::get('/weight-tracking', [WeightTrackingController::class, 'index'])->name('weight-tracking');
+    Route::post('/weight-tracking/store', [WeightTrackingController::class, 'store'])->name('weight-tracking.store');
+    Route::post('/weight-tracking/set-target', [WeightTrackingController::class, 'setTarget'])->name('weight-tracking.set-target');
+    Route::delete('/weight-tracking/{id}', [WeightTrackingController::class, 'destroy'])->name('weight-tracking.destroy');
+    Route::post('/weight-tracking/set-goal', [WeightTrackingController::class, 'setGoal'])->name('weight-tracking.set-goal');
+    Route::post('/food-log/set-calorie-goal', [FoodLogController::class, 'setCalorieGoal'])->name('food-log.set-calorie-goal');
 });

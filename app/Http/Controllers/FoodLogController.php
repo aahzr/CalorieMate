@@ -190,4 +190,18 @@ class FoodLogController extends Controller
         return redirect()->route('food-log', ['date' => $date->format('Y-m-d')])
             ->with('success', 'Food log deleted successfully.');
     }
+
+    public function setCalorieGoal(Request $request)
+    {
+        $request->validate([
+            'calorie_goal' => 'required|numeric|min:0',
+        ]);
+
+        $date = $request->query('date') ? Carbon::parse($request->query('date')) : Carbon::today();
+        $user = auth()->user();
+        $user->calorie_goal = $request->calorie_goal;
+        $user->save();
+
+        return redirect()->route('food-log', ['date' => $date->format('Y-m-d')])->with('success', 'Target kalori berhasil diatur.');
+    }
 }

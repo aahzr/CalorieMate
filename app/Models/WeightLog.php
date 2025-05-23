@@ -1,5 +1,4 @@
 <?php
-// app/Models/WeightLog.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +15,7 @@ class WeightLog extends Model
     ];
 
     protected $casts = [
-        'date' => 'date', // Otomatis konversi ke Carbon
+        'date' => 'date',
     ];
 
     public function user()

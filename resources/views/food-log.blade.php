@@ -84,10 +84,10 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <p class="fs-6 fw-semibold text-primary">Kalori Harian</p>
-                        <p class="fs-6 text-secondary">Target: <span class="fw-bold">{{ $calorieGoal }} kcal</span></p>
+                        <p class="fs-6 text-secondary">Target: <span class="fw-bold">{{ $calorieGoal ?? 1900 }} kcal</span></p>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar text-white fw-semibold" role="progressbar" style="width: {{ ($caloriesToday / $calorieGoal) * 100 }}%;" aria-valuenow="{{ $caloriesToday }}" aria-valuemin="0" aria-valuemax="{{ $calorieGoal }}">
+                        <div class="progress-bar text-white fw-semibold" role="progressbar" style="width: {{ ($caloriesToday / ($calorieGoal ?? 1900)) * 100 }}%;" aria-valuenow="{{ $caloriesToday }}" aria-valuemin="0" aria-valuemax="{{ $calorieGoal ?? 1900 }}">
                             {{ $caloriesToday }} kcal
                         </div>
                     </div>
@@ -105,6 +105,16 @@
                     <p class="fs-3 fw-bold text-primary">
                         {{ $remainingCalories }} <span class="fs-5 fw-normal">kcal</span>
                     </p>
+                    <form action="{{ route('food-log.set-calorie-goal', ['date' => $date->format('Y-m-d')]) }}" method="POST" class="mt-2">
+                        @csrf
+                        <div class="input-group">
+                            <input type="number" name="calorie_goal" class="form-control @error('calorie_goal') is-invalid @enderror" value="{{ old('calorie_goal', $calorieGoal ?? 1900) }}" min="0" required>
+                            <button type="submit" class="btn btn-primary">Set</button>
+                        </div>
+                        @error('calorie_goal')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </form>
                 </div>
             </div>
         </div>
@@ -298,44 +308,28 @@
             document.getElementById('searchResults').style.display = 'block';
         });
 
-        const calendarIcon = document.getElementById('calendarIcon');
+        // Sembunyikan input date asli, gunakan ikon kalender untuk trigger
         const datePicker = document.createElement('input');
         datePicker.type = 'date';
-        datePicker.id = 'customDatePicker';
+        datePicker.id = 'hiddenDatePicker';
         datePicker.style.position = 'absolute';
-        datePicker.style.zIndex = '1000';
-        datePicker.style.border = '1px solid #ced4da';
-        datePicker.style.borderRadius = '0.25rem';
-        datePicker.style.padding = '0.375rem 0.75rem';
-        datePicker.style.fontSize = '0.875rem';
-        datePicker.style.backgroundColor = '#fff';
-        datePicker.style.display = 'none';
+        datePicker.style.opacity = '0';
+        datePicker.style.width = '0';
+        datePicker.style.height = '0';
         document.body.appendChild(datePicker);
 
-        calendarIcon.addEventListener('click', function(e) {
-            e.preventDefault();
+        document.getElementById('calendarIcon').addEventListener('click', function() {
             const iconRect = calendarIcon.getBoundingClientRect();
             datePicker.style.top = (iconRect.bottom + window.scrollY) + 'px';
             datePicker.style.left = (iconRect.left + window.scrollX) + 'px';
             datePicker.value = '{{ $date->format('Y-m-d') }}';
-            datePicker.style.display = 'block';
-            datePicker.focus();
-
+            datePicker.showPicker();
             datePicker.onchange = function() {
                 const selectedDate = this.value;
                 if (selectedDate) {
                     window.location.href = "{{ route('food-log') }}?date=" + selectedDate;
-                    datePicker.style.display = 'none';
                 }
             };
-
-            // Sembunyikan picker jika klik di luar
-            document.addEventListener('click', function hidePicker(event) {
-                if (!calendarIcon.contains(event.target) && !datePicker.contains(event.target)) {
-                    datePicker.style.display = 'none';
-                    document.removeEventListener('click', hidePicker);
-                }
-            });
         });
     </script>
 
@@ -343,15 +337,19 @@
         <style>
             #calendarIcon {
                 font-size: 1.2rem;
-                cursor: pointer;
             }
-            #customDatePicker {
+            #hiddenDatePicker {
                 cursor: pointer;
+                background-color: #fff;
+                border: 1px solid #ced4da;
+                border-radius: 0.25rem;
+                padding: 0.375rem 0.75rem;
+                font-size: 0.875rem;
+                line-height: 1.5;
             }
-            #customDatePicker:focus {
+            #hiddenDatePicker:focus {
                 border-color: #0d6efd;
                 box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-                outline: none;
             }
         </style>
     @endsection
