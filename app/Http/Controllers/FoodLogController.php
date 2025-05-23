@@ -83,11 +83,16 @@ class FoodLogController extends Controller
                 return redirect()->back()->withErrors(['food_id' => 'Makanan tidak ditemukan atau data tidak lengkap di FatSecret.']);
             }
 
-            $serving = collect($foodData['servings']['serving'])->firstWhere('is_default', '1');
+            $servings = collect($foodData['servings']['serving']);
+            $serving = $servings->firstWhere('is_default', '1') ?? $servings->first();
             if (empty($serving)) {
-                \Log::warning('FoodLogController: No default serving found for food_id=' . $request->food_id);
+                \Log::warning('FoodLogController: No serving found for food_id=' . $request->food_id);
                 return redirect()->back()->withErrors(['food_id' => 'Data porsi makanan tidak tersedia.']);
             }
+
+            \Log::info('FoodLogController: Serving selected for food_id=' . $request->food_id, [
+                'serving' => $serving,
+            ]);
 
             $foodName = $foodData['food_name'];
             $calories = (int) $serving['calories'];
