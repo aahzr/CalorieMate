@@ -1,15 +1,23 @@
-@extends('layouts.app')
-
-@section('title', 'Reports & Insights')
-
-@section('content')
-    <div class="row g-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="fs-4 fw-semibold text-primary"><i class="fas fa-chart-line me-2"></i> Laporan & Wawasan</h1>
-                <a href="{{ route('reports.export-pdf') }}" class="btn btn-primary"><i class="far fa-file-pdf me-1"></i> Ekspor PDF</a>
-            </div>
-        </div>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Laporan & Wawasan</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .card { border: 1px solid #ddd; margin-bottom: 20px; padding: 15px; }
+        .text-primary { color: #0d6efd; }
+        .text-secondary { color: #6c757d; }
+        .table { width: 100%; border-collapse: collapse; }
+        .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .table th { background-color: #f8f9fa; }
+        .badge { padding: 5px 10px; border-radius: 10px; }
+        .bg-light-green { background-color: #e8f5e9; }
+    </style>
+</head>
+<body>
+    <h1 class="text-primary">Laporan & Wawasan</h1>
+    <p class="text-secondary">Tanggal Dibuat: {{ $reportDate }}</p>
+    <div class="row">
         <div class="col-12 col-md-6">
             <div class="card">
                 <div class="card-body">
@@ -17,7 +25,22 @@
                         <i class="fas fa-tint text-primary"></i>
                         <span class="fs-6 fw-semibold text-primary">Kalori Harian (Mingguan)</span>
                     </div>
-                    <canvas id="calorieChart" style="height: 200px;"></canvas>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Kalori</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($calorieData as $data)
+                                <tr>
+                                    <td>{{ $data->date->format('d M Y') }}</td>
+                                    <td>{{ $data->total_calories }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -28,7 +51,22 @@
                         <i class="fas fa-camera text-primary"></i>
                         <span class="fs-6 fw-semibold text-primary">Perubahan Berat Badan</span>
                     </div>
-                    <canvas id="weightChart" style="height: 200px;"></canvas>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Berat (kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($weightData as $data)
+                                <tr>
+                                    <td>{{ $data->date->format('d M Y') }}</td>
+                                    <td>{{ $data->weight }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -66,7 +104,7 @@
                         <i class="fas fa-utensils text-primary"></i>
                         <span class="fs-6 fw-semibold text-primary">Rangkuman Makanan Favorit</span>
                     </div>
-                    <table class="table table-borderless fs-6">
+                    <table class="table">
                         <thead>
                             <tr class="text-secondary">
                                 <th scope="col" class="text-start">#</th>
@@ -116,55 +154,5 @@
             </div>
         </div>
     </div>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    <script>
-        const ctxCalorie = document.getElementById('calorieChart').getContext('2d');
-        new Chart(ctxCalorie, {
-            type: 'line',
-            data: {
-                labels: [@foreach($calorieData as $data)'{{ $data->date->format('d M') }}', @endforeach],
-                datasets: [{
-                    label: 'Kalori',
-                    data: [@foreach($calorieData as $data){{ $data->total_calories }}, @endforeach],
-                    borderColor: '#4CAF50',
-                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                scales: {
-                    y: { beginAtZero: true }
-                },
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
-
-        const ctxWeight = document.getElementById('weightChart').getContext('2d');
-        new Chart(ctxWeight, {
-            type: 'line',
-            data: {
-                labels: [@foreach($weightData as $data)'{{ $data->date->format('d M') }}', @endforeach],
-                datasets: [{
-                    label: 'Berat (kg)',
-                    data: [@foreach($weightData as $data){{ $data->weight }}, @endforeach],
-                    borderColor: '#4CAF50',
-                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                scales: {
-                    y: { beginAtZero: false }
-                },
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
-    </script>
-@endsection
+</body>
+</html>
