@@ -8,17 +8,16 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-// Rute autentikasi
 Auth::routes(['verify' => false]);
 
-// Rute publik
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-// Rute yang memerlukan autentikasi
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/food-log', [FoodLogController::class, 'index'])->name('food-log');
     Route::post('/food-log', [FoodLogController::class, 'store'])->name('food-log.store');
+    Route::put('/food-log/{foodLog}', [FoodLogController::class, 'update'])->name('food-log.update');
+    Route::delete('/food-log/{foodLog}', [FoodLogController::class, 'destroy'])->name('food-log.destroy');
     Route::get('/weight-tracking', [WeightTrackingController::class, 'index'])->name('weight-tracking');
     Route::post('/weight-tracking', [WeightTrackingController::class, 'store'])->name('weight-tracking.store');
     Route::get('/diet-journal', [DietJournalController::class, 'index'])->name('diet-journal');
