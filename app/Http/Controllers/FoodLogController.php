@@ -141,14 +141,22 @@ class FoodLogController extends Controller
     {
         $this->authorize('update', $foodLog);
 
-        $request->validate([
-            'meal_type' => 'required|in:Breakfast,Lunch,Dinner,Snack',
-            'food_name' => 'required|string|max:255',
-            'calories' => 'required|integer|min:0',
-            'carbohydrate' => 'nullable|numeric|min:0',
-            'protein' => 'nullable|numeric|min:0',
-            'fat' => 'nullable|numeric|min:0',
-        ]);
+        try {
+            $request->validate([
+                'meal_type' => 'required|in:Breakfast,Lunch,Dinner,Snack',
+                'food_name' => 'required|string|max:255',
+                'calories' => 'required|integer|min:0',
+                'carbohydrate' => 'nullable|numeric|min:0',
+                'protein' => 'nullable|numeric|min:0',
+                'fat' => 'nullable|numeric|min:0',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::warning('FoodLogController: Validation failed on update', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all(),
+            ]);
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        }
 
         $foodLog->update([
             'meal_type' => $request->meal_type,

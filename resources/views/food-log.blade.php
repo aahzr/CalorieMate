@@ -68,7 +68,7 @@
                                 </div>
                             @endforeach
                         @else
-                            <p class="fs-6 text-secondary">Tidak ada hasil ditemukan. Coba kueri lain seperti 'chicken' atau gunakan input manual.</p>
+                            <p class="fs-6 text-secondary">Tidak ada hasil ditemukan. Coba kueri lain seperti 'chicken' atau gunakan input manual di card.</p>
                             @if ($searchQuery)
                                 <p class="fs-6 text-secondary">Kueri: {{ $searchQuery }}</p>
                             @endif
@@ -106,62 +106,6 @@
                     </p>
                 </div>
             </div>
-        </div>
-        <!-- Input Manual -->
-        <div class="col-12">
-            <form action="{{ route('food-log.store') }}?date={{ $date->format('Y-m-d') }}" method="POST" class="card mb-4">
-                @csrf
-                <div class="card-body">
-                    <h3 class="fs-5 fw-semibold text-primary mb-3">Tambah Makanan Manual</h3>
-                    <div class="row g-3">
-                        <div class="col-12 col-md-2">
-                            <select name="meal_type" class="form-select @error('meal_type') is-invalid @enderror" required>
-                                <option value="" disabled selected>Tipe</option>
-                                <option value="Breakfast">Sarapan</option>
-                                <option value="Lunch">Makan Siang</option>
-                                <option value="Dinner">Makan Malam</option>
-                                <option value="Snack">Camilan</option>
-                            </select>
-                            @error('meal_type')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <input type="text" name="food_name" class="form-control @error('food_name') is-invalid @enderror" placeholder="Nama Makanan" value="{{ old('food_name') }}" required>
-                            @error('food_name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-12 col-md-2">
-                            <input type="number" name="calories" class="form-control @error('calories') is-invalid @enderror" placeholder="Kalori (kcal)" min="0" value="{{ old('calories') }}" required>
-                            @error('calories')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-12 col-md-2">
-                            <input type="number" step="0.01" name="carbohydrate" class="form-control @error('carbohydrate') is-invalid @enderror" placeholder="Karbo (g)" min="0" value="{{ old('carbohydrate') }}">
-                            @error('carbohydrate')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-12 col-md-2">
-                            <input type="number" step="0.01" name="protein" class="form-control @error('protein') is-invalid @enderror" placeholder="Protein (g)" min="0" value="{{ old('protein') }}">
-                            @error('protein')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-12 col-md-2">
-                            <input type="number" step="0.01" name="fat" class="form-control @error('fat') is-invalid @enderror" placeholder="Lemak (g)" min="0" value="{{ old('fat') }}">
-                            @error('fat')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        <div class="col-12 col-md-2">
-                            <button type="submit" class="btn btn-primary w-100">Tambah</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
         </div>
         <!-- Log Makanan -->
         @foreach(['Breakfast', 'Lunch', 'Dinner', 'Snack'] as $mealType)
