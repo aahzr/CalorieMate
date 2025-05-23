@@ -17,15 +17,31 @@
             background-color: #F5F8F3;
             color: #1A3A1A;
             overscroll-behavior: none;
+            margin: 0;
+        }
+        .wrapper {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
         }
         .sidebar {
             background-color: #fff;
             border-right: 1px solid #E6F0E6;
-            transition: all 0.3s ease;
+            width: 250px;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
         }
         .sidebar a {
             color: #1A3A1A;
             transition: color 0.2s ease;
+            text-decoration: none; /* Menghapus garis bawah pada semua link di sidebar */
         }
         .sidebar a:hover, .sidebar a.active {
             color: #4CAF50;
@@ -102,28 +118,60 @@
         .notification-item:hover {
             background-color: #E6F0E6;
         }
+        main {
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            background: none;
+            border: none;
+            color: #2E7D32;
+            cursor: pointer;
+        }
         @media (max-width: 768px) {
             .sidebar {
-                width: 100%;
-                position: fixed;
-                z-index: 1000;
-                height: auto;
+                transform: translateX(-100%);
+            }
+            .sidebar-open {
+                transform: translateX(0);
             }
             main {
-                margin-top: 80px;
+                margin-left: 0 !important;
+            }
+            .hamburger {
+                display: block;
+            }
+            .container-fluid {
+                padding: 0 10px;
+            }
+        }
+        @media (min-width: 769px) {
+            .sidebar {
+                transform: translateX(0);
+            }
+            main {
+                margin-left: 250px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="d-flex min-vh-100">
+    <div class="wrapper">
         <!-- Sidebar -->
-        <aside class="sidebar p-4 d-flex flex-column justify-content-between" style="width: 250px;">
+        <aside class="sidebar p-4 d-flex flex-column justify-content-between">
             <div>
-                <a class="d-flex align-items-center mb-5" href="{{ route('dashboard') }}">
-                    <img src="https://storage.googleapis.com/a1aa/image/c88537fa-4ebe-4881-da23-848228fa381b.jpg" alt="CalorieMate logo" class="me-2" style="width: 24px; height: 24px;">
-                    <span class="fs-5 fw-semibold text-primary">CalorieMate</span>
-                </a>
+                <div class="d-flex align-items-center justify-content-between mb-5">
+                    <a class="d-flex align-items-center" href="{{ route('dashboard') }}" style="text-decoration: none;">
+                        <img src="https://storage.googleapis.com/a1aa/image/c88537fa-4ebe-4881-da23-848228fa381b.jpg" alt="New CalorieMate Logo" class="me-2" style="width: 24px; height: 24px;">
+                        <span class="fs-5 fw-semibold text-primary" style="text-decoration: none;">CalorieMate</span>
+                    </a>
+                    <button class="hamburger d-block d-md-none" id="sidebarToggleClose">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
                 <nav class="d-flex flex-column gap-2">
                     @auth
                         <a class="nav-link d-flex align-items-center gap-2 py-2 px-3 {{ Route::is('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
@@ -164,11 +212,11 @@
                         @csrf
                     </form>
                 @else
-                    <a class="d-flex align-items-center gap-2 text-primary fw-semibold py-2 px-3" href="{{ route('login') }}">
+                    <a class="d-flex align-items-center gap-2 text-primary fw-semibold py-2 px-3" href="{{ route('login') }}" style="text-decoration: none;">
                         <i class="fas fa-sign-in-alt"></i> Login
                     </a>
                     @if (Route::has('register'))
-                        <a class="d-flex align-items-center gap-2 text-primary fw-semibold py-2 px-3" href="{{ route('register') }}">
+                        <a class="d-flex align-items-center gap-2 text-primary fw-semibold py-2 px-3" href="{{ route('register') }}" style="text-decoration: none;">
                             <i class="fas fa-user-plus"></i> Register
                         </a>
                     @endif
@@ -177,9 +225,14 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-grow-1 p-4">
+        <main>
             <header class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="fs-4 fw-semibold text-primary">@yield('title')</h1>
+                <div class="d-flex align-items-center">
+                    <button class="hamburger d-md-none me-3" id="sidebarToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="fs-4 fw-semibold text-primary">@yield('title')</h1>
+                </div>
                 @auth
                     <div class="d-flex align-items-center gap-3">
                         <button aria-label="Notifications" class="position-relative text-primary bg-transparent border-0" data-bs-toggle="modal" data-bs-target="#notificationsModal">
@@ -192,7 +245,7 @@
                     </div>
                 @endauth
             </header>
-            <div class="container">
+            <div class="container-fluid">
                 @yield('content')
             </div>
         </main>
@@ -230,5 +283,25 @@
 
     <!-- Bootstrap JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarToggleClose = document.getElementById('sidebarToggleClose');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('sidebar-open');
+        });
+
+        sidebarToggleClose.addEventListener('click', () => {
+            sidebar.classList.remove('sidebar-open');
+        });
+
+        // Tutup sidebar jika mengklik di luar sidebar pada layar kecil
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                sidebar.classList.remove('sidebar-open');
+            }
+        });
+    </script>
 </body>
 </html>
