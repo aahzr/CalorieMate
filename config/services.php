@@ -2,6 +2,12 @@
 
 return [
 
+    'fatsecret' => [
+        'consumer_key' => env('FATSECRET_CONSUMER_KEY'),
+        'consumer_secret' => env('FATSECRET_CONSUMER_SECRET'),
+        'api_url' => env('FATSECRET_API_URL'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Third Party Services

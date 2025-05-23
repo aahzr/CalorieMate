@@ -1,5 +1,4 @@
 <?php
-// database/migrations/YYYY_MM_DD_create_food_logs_table.php
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,9 +11,12 @@ class CreateFoodLogsTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->date('date');
-            $table->string('meal_type'); // Breakfast, Lunch, Dinner, Snack
+            $table->enum('meal_type', ['Breakfast', 'Lunch', 'Dinner', 'Snack']);
             $table->string('food_name');
             $table->integer('calories');
+            $table->float('carbohydrate')->nullable();
+            $table->float('protein')->nullable();
+            $table->float('fat')->nullable();
             $table->timestamps();
         });
     }

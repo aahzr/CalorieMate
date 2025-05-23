@@ -9,13 +9,8 @@ class FoodLog extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'date',
-        'meal_type',
-        'food_name',
-        'calories',
-    ];
+    protected $fillable = ['user_id', 'date', 'meal_type', 'food_name', 'calories', 'carbohydrate', 'protein', 'fat'];
+    protected $casts = ['date' => 'date'];
 
     public function user()
     {

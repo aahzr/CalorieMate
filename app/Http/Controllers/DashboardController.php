@@ -16,20 +16,19 @@ class DashboardController extends Controller
 
     public function index()
     {
-        $date = Carbon::today(); // Selalu objek Carbon
+        $date = Carbon::today();
         $caloriesToday = FoodLog::where('user_id', auth()->id())
             ->whereDate('date', $date)
             ->sum('calories');
-        $calorieGoal = Auth::user()->calorie_goal ?? 1800; // Sinkron dengan FoodLogController
+        $calorieGoal = Auth::user()->calorie_goal ?? 1800;
         $remainingCalories = max(0, $calorieGoal - $caloriesToday);
 
-        // Logika placeholder untuk streak
         $streak = FoodLog::where('user_id', auth()->id())
             ->where('date', '>=', Carbon::today()->subDays(30))
-            ->orderBy('date', 'asc') // Urutkan untuk konsistensi
+            ->orderBy('date', 'asc')
             ->get()
             ->groupBy(function ($log) {
-                return Carbon::parse($log->date)->format('Y-m-d'); // Konversi string ke Carbon
+                return Carbon::parse($log->date)->format('Y-m-d');
             })
             ->reduce(function ($streak, $logs, $date) {
                 static $lastDate = null;
@@ -43,13 +42,12 @@ class DashboardController extends Controller
                     return $streak + 1;
                 }
                 return $streak;
-            }, 0) ?: 5; // Default 5 sesuai kode asli
+            }, 0) ?: 5;
 
-        // Logika placeholder untuk kalori terbakar
         $weightLog = WeightLog::where('user_id', auth()->id())
             ->orderBy('date', 'desc')
             ->first();
-        $caloriesBurned = $weightLog ? round($weightLog->weight * 5.5) : 420; // 5.5 kcal/kg/hari, default 420
+        $caloriesBurned = $weightLog ? round($weightLog->weight * 5.5) : 420;
 
         \Log::info('Dashboard: date=' . $date->format('Y-m-d') . ', calories=' . $caloriesToday . ', goal=' . $calorieGoal . ', remaining=' . $remainingCalories . ', streak=' . $streak . ', burned=' . $caloriesBurned);
 
