@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/DietJournalController.php
 namespace App\Http\Controllers;
 
 use App\Models\Journal;
@@ -8,15 +7,19 @@ use Illuminate\Support\Carbon;
 
 class DietJournalController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index()
     {
-        $date = Carbon::today();
         $journals = Journal::where('user_id', auth()->id())
-            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->take(3)
             ->get();
 
-        return view('diet-journal', compact('journals', 'date'));
+        return view('diet-journal', compact('journals'));
     }
 
     public function store(Request $request)
@@ -28,11 +31,19 @@ class DietJournalController extends Controller
 
         Journal::create([
             'user_id' => auth()->id(),
-            'date' => Carbon::today(),
+            'date' => Carbon::now(),
             'content' => $request->content,
             'mood' => $request->mood,
         ]);
 
         return redirect()->route('diet-journal')->with('success', 'Journal entry added successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $journal = Journal::where('user_id', auth()->id())->findOrFail($id);
+        $journal->delete();
+
+        return redirect()->route('diet-journal')->with('success', 'Journal entry deleted successfully.');
     }
 }

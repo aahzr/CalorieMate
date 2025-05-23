@@ -31,8 +31,28 @@
                         @else
                             @foreach ($journals as $journal)
                                 <div class="border-bottom py-3">
-                                    <p class="fw-semibold text-primary">{{ $journal->date->format('d M Y') }}</p>
-                                    <p class="text-secondary">{{ $journal->content }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <p class="fw-semibold text-primary">{{ $journal->created_at->format('d M Y, H:i') }}</p>
+                                            <p class="text-secondary">{{ $journal->content }}</p>
+                                            <p class="text-secondary">Mood: 
+                                                <span class="fw-semibold">
+                                                    @if($journal->mood == 'Happy')
+                                                        😊 Happy
+                                                    @elseif($journal->mood == 'Neutral')
+                                                        😐 Neutral
+                                                    @else
+                                                        😢 Sad
+                                                    @endif
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <form action="{{ route('diet-journal.destroy', $journal->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-link text-danger p-0" onclick="return confirm('Hapus jurnal ini?')"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
                                 </div>
                             @endforeach
                         @endif
@@ -51,12 +71,22 @@
                             @csrf
                             <div class="modal-body">
                                 <div class="mb-3">
-                                    <label for="date" class="form-label">Tanggal</label>
-                                    <input type="date" class="form-control" id="date" name="date" value="{{ now()->format('Y-m-d') }}" required>
+                                    <label for="content" class="form-label">Catatan</label>
+                                    <textarea class="form-control @error('content') is-invalid @enderror" id="content" name="content" rows="4" required>{{ old('content') }}</textarea>
+                                    @error('content')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="mb-3">
-                                    <label for="content" class="form-label">Catatan</label>
-                                    <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
+                                    <label for="mood" class="form-label">Mood</label>
+                                    <select class="form-control @error('mood') is-invalid @enderror" id="mood" name="mood" required>
+                                        <option value="Happy" {{ old('mood') == 'Happy' ? 'selected' : '' }}>😊 Happy</option>
+                                        <option value="Neutral" {{ old('mood') == 'Neutral' ? 'selected' : '' }}>😐 Neutral</option>
+                                        <option value="Sad" {{ old('mood') == 'Sad' ? 'selected' : '' }}>😢 Sad</option>
+                                    </select>
+                                    @error('mood')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="modal-footer">
